@@ -1,18 +1,22 @@
 <template>
-  <v-row>
-    <v-col v-for="{ title, icon, actions } in menus" :key="title" cols="12" md="6">
-      <home-menu :title="title" :icon="icon" :actions="actions" />
-    </v-col>
-  </v-row>
+  <the-container>
+    <v-row>
+      <v-col v-for="{ title, icon, actions } in menus" :key="title" cols="12" md="6">
+        <home-menu :title="title" :icon="icon" :actions="actions" />
+      </v-col>
+    </v-row>
+  </the-container>
 </template>
 
 <script>
 import HomeMenu from './components/Menu';
+import TheContainer from '../../components/TheContainer.vue';
 
 export default {
   name: 'Home',
   components: {
     HomeMenu,
+    TheContainer,
   },
   data: () => ({
     menus: [
