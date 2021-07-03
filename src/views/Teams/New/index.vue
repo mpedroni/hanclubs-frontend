@@ -1,6 +1,6 @@
 <template>
   <the-container>
-    <v-form v-model="valid" ref="form" @submit="submit" lazy-validation>
+    <v-form v-model="valid" ref="form" @submit.prevent="submit" lazy-validation>
       <v-row justify="center">
         <v-col cols="12" md="6">
           <text-input
