@@ -5,7 +5,7 @@
         {{ icon }}
       </v-icon>
 
-      <v-toolbar-title class="grey--text text--darken-2" :title="title">
+      <v-toolbar-title class="grey--text text--darken-2">
         {{ title }}
       </v-toolbar-title>
     </v-app-bar>
