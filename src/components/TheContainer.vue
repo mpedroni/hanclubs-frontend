@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-card flat>
+    <v-card flat color="grey lighten-5" rounded>
       <v-card-title class="accent--text">
         <v-icon color="accent"> mdi-chevron-right </v-icon>
         {{ $route.name }}
