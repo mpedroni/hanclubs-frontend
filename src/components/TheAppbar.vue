@@ -1,7 +1,9 @@
 <template>
   <v-app-bar app flat color="primary">
     <v-toolbar-title>
-      <logo />
+      <router-link to="/">
+        <logo />
+      </router-link>
     </v-toolbar-title>
 
     <v-spacer />
