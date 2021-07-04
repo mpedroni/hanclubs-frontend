@@ -21,6 +21,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "new-team" */ '@/views/Teams/New'),
   },
   {
+    path: '/partners',
+    name: 'Sócios Cadastrados',
+    component: () => import(/* webpackChunkName: "partners" */ '@/views/Partners'),
+  },
+  {
     path: '/partners/new',
     name: 'Novo Sócio',
     component: () => import(/* webpackChunkName: "new-partner" */ '@/views/Partners/New'),
