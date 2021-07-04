@@ -7,7 +7,7 @@
             v-model="name"
             label="Nome Completo"
             clearable
-            :rules="[(v) => !!v || 'Você precisa o nome do novo sócio']"
+            :rules="[(v) => !!v || 'Você precisa informar o nome do novo sócio']"
           />
         </v-col>
 
