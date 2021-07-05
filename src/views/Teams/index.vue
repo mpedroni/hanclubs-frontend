@@ -3,7 +3,9 @@
     <v-row justify="center">
       <v-col cols="auto">
         <v-data-table
+          class="transparent"
           :headers="headers"
+          :hide-default-footer="!teams.length"
           :items="mapTeams"
           :loading="loading"
           no-data-text="Nenhum clube cadastrado"
@@ -51,6 +53,10 @@ export default {
     TheContainer,
   },
 
+  mounted() {
+    this.getTeams();
+  },
+
   data: () => ({
     dialog: false,
     headers: [
@@ -76,58 +82,7 @@ export default {
       message: '',
       color: '',
     },
-
-    teams: [
-      {
-        id: 1,
-        name: 'Flamengo',
-      },
-      {
-        id: 2,
-        name: 'Palmeiras',
-      },
-      {
-        id: 3,
-        name: 'Botafogo',
-      },
-      {
-        id: 4,
-        name: 'Corinthians',
-      },
-      {
-        id: 5,
-        name: 'Fluminense',
-      },
-      {
-        id: 6,
-        name: 'São Paulo',
-      },
-      {
-        id: 7,
-        name: 'Internacional',
-      },
-      {
-        id: 8,
-        name: 'Grêmio',
-      },
-      {
-        id: 9,
-        name: 'Santos',
-      },
-      {
-        id: 10,
-        name: 'Sport Recife',
-      },
-      {
-        id: 11,
-        name: 'Chapecoense',
-      },
-      {
-        id: 12,
-        name: 'Barcelona',
-      },
-    ],
-
+    teams: [],
     teamToDelete: null,
   }),
 
@@ -144,7 +99,20 @@ export default {
 
       this.$http
         .delete(`teams/${team.id}`)
-        .then(() => this.snackbar(`O clube ${team.name} foi excluído com sucesso!`, 'success'))
+        .then((teams) => {
+          this.teams = teams;
+          this.snackbar(`O clube ${team.name} foi excluído com sucesso!`, 'success');
+        })
+        .catch((error) => this.snackbar(error, 'error'))
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+    async getTeams() {
+      this.loading = true;
+
+      this.teams = await this.$http
+        .get('teams')
         .catch((error) => this.snackbar(error, 'error'))
         .finally(() => {
           this.loading = false;
