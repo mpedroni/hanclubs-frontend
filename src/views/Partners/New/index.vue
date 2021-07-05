@@ -4,7 +4,7 @@
       <v-row>
         <v-col cols="12" md="6">
           <text-input
-            v-model="name"
+            v-model="partner.name"
             label="Nome Completo"
             clearable
             :rules="[(v) => !!v || 'Você precisa informar o nome do novo sócio']"
@@ -13,7 +13,7 @@
 
         <v-col>
           <autocomplete
-            v-model="partnerTeams"
+            v-model="partner.teams"
             multiple
             chips
             small-chips
@@ -25,7 +25,7 @@
             label="Clubes"
             hide-selected
             :rules="[(v) => !!v.length || 'Você deve selecionar pelo menos um clube']"
-            item-value="id"
+            return-object
             item-text="name"
             :items="teams"
           />
@@ -66,69 +66,31 @@ export default {
     TheContainer,
   },
 
+  mounted() {
+    this.getTeams();
+  },
+
   data: () => ({
     loading: false,
-    name: '',
-    partnerTeams: [],
+    partner: {
+      name: '',
+      teams: [],
+    },
     snackbarOptions: {
       open: false,
       message: '',
       color: '',
     },
-    teams: [
-      {
-        id: 1,
-        name: 'Flamengo',
-      },
-      {
-        id: 2,
-        name: 'Palmeiras',
-      },
-      {
-        id: 3,
-        name: 'Botafogo',
-      },
-      {
-        id: 4,
-        name: 'Corinthians',
-      },
-      {
-        id: 5,
-        name: 'Fluminense',
-      },
-      {
-        id: 6,
-        name: 'São Paulo',
-      },
-      {
-        id: 7,
-        name: 'Internacional',
-      },
-      {
-        id: 8,
-        name: 'Grêmio',
-      },
-      {
-        id: 9,
-        name: 'Santos',
-      },
-      {
-        id: 10,
-        name: 'Sport Recife',
-      },
-      {
-        id: 11,
-        name: 'Chapecoense',
-      },
-      {
-        id: 12,
-        name: 'Barcelona',
-      },
-    ],
+    teams: [],
     valid: true,
   }),
 
   methods: {
+    async getTeams() {
+      this.teams =
+        (await this.$http.get('teams').catch((error) => this.snackbar(error, 'error'))) || [];
+    },
+
     snackbar(message, color) {
       this.snackbarOptions = {
         message,
@@ -142,12 +104,12 @@ export default {
 
       this.loading = true;
 
-      const { name, partnerTeams: teams } = this;
+      const { partner } = this;
 
       this.$http
-        .post('partners', { name: name.trim(), teams })
-        .then(() => {
-          this.snackbar(`O sócio ${name} foi cadastrado com sucesso!`, 'success');
+        .post('partners', partner)
+        .then((partner) => {
+          this.snackbar(`O sócio ${partner.name} foi cadastrado com sucesso!`, 'success');
           this.$refs.form.reset();
         })
         .catch((error) => this.snackbar(error, 'error'))
