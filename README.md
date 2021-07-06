@@ -1,24 +1,19 @@
-# hanclubs-frontend
+# hanclubs-backend
+## Frontend de uma aplicação-teste implementada para fins de nivelamento de uma vaga de emprego.
+A aplicação consiste em um app/site para gerenciamento de clubes de futebol e seus sócios. 
 
-## Project setup
-```
-yarn install
-```
+### Requisitos
+* NodeJS >= v12
+* Yarn v1.*
 
-### Compiles and hot-reloads for development
+### Instalação
+* Depois de clonar o repositório, entre no diretório do projeto e instale as dependencias:
 ```
-yarn serve
-```
-
-### Compiles and minifies for production
-```
-yarn build
+yarn
 ```
 
-### Lints and fixes files
+* Depois de instalar as dependencias, inicie o projeto:
 ```
-yarn lint
+yarn dev
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+* Para conexão com a API, é necessário criar um arquivo <code>.env.development|production</code> ou <code>.env.development|production.local</code> na raiz do projeto contendo as variáveis descritas no arquivo <code>/.env.example</code>
