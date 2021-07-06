@@ -1,59 +1,60 @@
 <template>
   <the-container>
     <v-row>
-      <v-col cols="12">
+      <v-col cols="12" md="6">
         <text-input
-          v-model="filter"
-          label="Filtro"
+          v-model="filterByPartner"
+          label="Filtrar por Sócio"
           placeholder="Digite o nome do sócio que você deseja encontrar"
+        />
+      </v-col>
+      <v-col cols="12" md="6">
+        <text-input
+          v-model="filterByTeam"
+          label="Filtrar por Clube"
+          placeholder="Digite o nome do clube que você deseja encontrar"
         />
       </v-col>
     </v-row>
     <v-row justify="center">
-      <v-col cols="12" md="12">
-        <v-app-bar flat color="accent">
-          <v-toolbar-title class="grey--text text--darken-2"> Sócios </v-toolbar-title>
-        </v-app-bar>
-        <v-list two-line color="transparent">
-          <v-list-item v-if="loading">
-            <v-list-item-content> Buscando os sócios cadastrados... </v-list-item-content>
+      <v-col cols="12">
+        <v-list v-if="loading || !teamPartners.length" two-line color="transparent" subheader>
+          <v-list-item>
+            <v-list-item-content>
+              {{ loading ? 'Buscando os sócios cadastrados...' : 'Nenhum sócio cadastrado.' }}
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+
+        <v-list
+          v-else
+          v-for="team in filteredTeamPartners"
+          :key="team.id"
+          color="transparent"
+          dense
+        >
+          <span class="text-h6">{{ team.name }}</span>
+          <v-subheader v-if="team.partners.length">Sócios</v-subheader>
+
+          <v-list-item v-for="partner in team.partners" :key="partner.id" link>
+            <v-list-item-content>
+              <v-list-item-title>
+                {{ partner.name }}
+              </v-list-item-title>
+            </v-list-item-content>
+            <v-list-item-action>
+              <v-btn icon>
+                <v-icon color="red" @click="(partnerToDelete = partner), (dialog = true)">
+                  mdi-delete
+                </v-icon>
+              </v-btn>
+            </v-list-item-action>
           </v-list-item>
 
-          <template
-            v-else-if="filteredPartners.length"
-            v-for="(partner, index) in filteredPartners"
-          >
-            <v-divider v-if="index" :key="partner.id" />
-            <v-list-item :key="partner.id">
-              <v-list-item-content>
-                <v-list-item-title>
-                  {{ partner.name }}
-                </v-list-item-title>
-
-                <v-list-item-subtitle class="text-caption">
-                  {{ partner.teams.map((team) => team.name).join(', ') }}
-                </v-list-item-subtitle>
-              </v-list-item-content>
-
-              <v-list-item-action>
-                <v-tooltip top>
-                  <template #activator="{ on }">
-                    <v-icon
-                      v-on="on"
-                      color="red"
-                      @click.prevent="(partnerToDelete = partner), (dialog = true)"
-                    >
-                      mdi-delete
-                    </v-icon>
-                  </template>
-                  Remover Sócio
-                </v-tooltip>
-              </v-list-item-action>
-            </v-list-item>
-          </template>
-
-          <v-list-item v-else>
-            <v-list-item-content> Nenhum sócio cadastrado. </v-list-item-content>
+          <v-list-item v-if="!team.partners.length">
+            <v-list-item-content>
+              Nenhum sócio está associado ao clube {{ team.name }}
+            </v-list-item-content>
           </v-list-item>
         </v-list>
       </v-col>
@@ -90,163 +91,69 @@ export default {
     TheContainer,
   },
 
-  // temporary until the api is ready
   mounted() {
-    this.fakeApiCall();
+    this.getTeamPartners();
   },
 
   data: () => ({
     dialog: false,
-    filter: '',
+    filterByPartner: '',
+    filterByTeam: '',
     loading: true,
     snackbarOptions: {
       open: false,
       message: '',
       color: '',
     },
-    teams: [
-      {
-        id: 1,
-        name: 'Flamengo',
-      },
-      {
-        id: 2,
-        name: 'Palmeiras',
-      },
-      {
-        id: 3,
-        name: 'Botafogo',
-      },
-      {
-        id: 4,
-        name: 'Corinthians',
-      },
-      {
-        id: 5,
-        name: 'Fluminense',
-      },
-      {
-        id: 6,
-        name: 'São Paulo',
-      },
-      {
-        id: 7,
-        name: 'Internacional',
-      },
-      {
-        id: 8,
-        name: 'Grêmio',
-      },
-      {
-        id: 9,
-        name: 'Santos',
-      },
-      {
-        id: 10,
-        name: 'Sport Recife',
-      },
-      {
-        id: 11,
-        name: 'Chapecoense',
-      },
-      {
-        id: 12,
-        name: 'Barcelona',
-      },
-    ],
-    partners: [],
+    teamPartners: [],
     partnerToDelete: null,
   }),
 
   computed: {
-    filteredPartners() {
-      return this.filter
-        ? this.partners.filter((partner) =>
-            partner.name.toLowerCase().includes(this.filter.toLowerCase())
-          )
-        : this.partners;
+    filteredTeamPartners() {
+      return this.filterByPartner || this.filterByTeam
+        ? this.teamPartners.reduce((teams, team) => {
+            if (this.filterByTeam && !team.name.toLowerCase().includes(this.filterByTeam))
+              return teams;
+
+            const partners = this.filterByPartner
+              ? team.partners.filter((partner) =>
+                  partner.name.toLowerCase().includes(this.filterByPartner.toLowerCase())
+                )
+              : team.partners;
+
+            if (this.filterByPartner && !partners.length) return teams;
+
+            return [...teams, { ...team, partners }];
+          }, [])
+        : this.teamPartners;
     },
   },
 
   methods: {
-    /*
-     * temporary until the api is ready
-     */
-    sortTeams() {
-      const teamsQuantity = Number.parseInt(Math.random() * this.teams.length, 10) || 1;
-
-      const teams = [];
-
-      for (let team = 0; team < teamsQuantity; team += 1) {
-        const index = Number.parseInt(Math.random() * (teamsQuantity - 1), 10);
-
-        teams.push(this.teams[index]);
-      }
-
-      return teams;
-    },
-
-    fakeApiCall() {
-      this.partners = [
-        {
-          name: 'Matheus Pedroni',
-          teams: this.sortTeams(),
-        },
-        {
-          name: 'Elon Musk',
-          teams: this.sortTeams(),
-        },
-        {
-          name: 'Harry Potter',
-          teams: this.sortTeams(),
-        },
-        {
-          name: 'Albus Percival Wulfric Brian Dumbledore',
-          teams: this.sortTeams(),
-        },
-        {
-          name: 'Severus Snape',
-          teams: this.sortTeams(),
-        },
-        {
-          name: 'Hermione Granger',
-          teams: this.sortTeams(),
-        },
-        {
-          name: 'Ronald Weasley',
-          teams: this.sortTeams(),
-        },
-        {
-          name: 'Bill Gates',
-          teams: this.sortTeams(),
-        },
-        {
-          name: 'Steve Jobs',
-          teams: this.sortTeams(),
-        },
-        {
-          name: 'Poderosíssimo Ninja',
-          teams: this.sortTeams(),
-        },
-      ];
-
-      setTimeout(() => {
-        this.loading = false;
-      }, 3000);
-    },
-    /* ****** */
-
     deletePartner(partner) {
       this.loading = true;
       this.dialog = false;
 
       this.$http
-        .delete(`teams/${partner.id}`)
-        .then(() => this.snackbar(`O sócio ${partner.name} foi excluído com sucesso!`, 'success'))
-        .catch((error) => this.snackbar(error, 'error'))
-        .finally(() => {
+        .delete(`partners/${partner.id}`)
+        .then(() => {
+          this.snackbar(`O sócio ${partner.name} foi excluído com sucesso!`, 'success');
+          this.getTeamPartners();
+        })
+        .catch((error) => {
+          this.snackbar(error, 'error');
           this.loading = false;
         });
+    },
+    async getTeamPartners() {
+      this.teamPartners =
+        (await this.$http
+          .get('teams-partners')
+          .catch((error) => this.snackbar(error, 'error'))
+          .finally(() => {
+            this.loading = false;
+          })) || [];
     },
     snackbar(message, color) {
       this.snackbarOptions = {
