@@ -1,4 +1,4 @@
-# hanclubs-backend
+# hanclubs-frontend
 ## Frontend de uma aplicação-teste implementada para fins de nivelamento de uma vaga de emprego.
 A aplicação consiste em um app/site para gerenciamento de clubes de futebol e seus sócios. 
 
